@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-tasks me-2 text-primary"></i>任务管理</h2>
+    <button class="btn btn-primary"><i class="fas fa-plus me-2"></i>新建任务</button>
+</div>
+
+<div class="card">
+    <div class="card-header">
+        <i class="fas fa-list me-2"></i>任务列表 (资源匹配方案)
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>任务ID</th>
+                        <th>物料名称</th>
+                        <th>原子操作</th>
+                        <th>分配设备</th>
+                        <th>执行时间</th>
+                        <th>状态</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for task in tasks %}
+                    <tr>
+                        <td><span class="fw-bold">{{ task['任务ID'] }}</span></td>
+                        <td>{{ task['物料名称'] }}</td>
+                        <td>{{ task['原子操作'] }}</td>
+                        <td>
+                            <span class="badge bg-info text-dark">{{ task['分配设备'] }}</span>
+                        </td>
+                        <td>{{ task['执行时间'] }}</td>
+                        <td>
+                            {% if task['资源状态'] == '可用' %}
+                                <span class="badge bg-success">已分配</span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">{{ task['资源状态'] }}</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% if not tasks %}
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">暂无任务数据</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <div class="card-footer clearfix">
+        <ul class="pagination pagination-sm m-0 float-end">
+            <li class="page-item"><a class="page-link" href="#">&laquo;</a></li>
+            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+            <li class="page-item"><a class="page-link" href="#">2</a></li>
+            <li class="page-item"><a class="page-link" href="#">3</a></li>
+            <li class="page-item"><a class="page-link" href="#">&raquo;</a></li>
+        </ul>
+    </div>
+</div>
+{% endblock %}
+

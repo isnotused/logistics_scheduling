@@ -1,0 +1,129 @@
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f4f6f9;
+    overflow-x: hidden;
+}
+
+/* Login Page */
+.login-body {
+    background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-card {
+    background: white;
+    padding: 2.5rem;
+    border-radius: 1rem;
+    box-shadow: 0 1rem 3rem rgba(0,0,0,0.175);
+    width: 100%;
+    max-width: 400px;
+}
+
+.fade-in {
+    animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Sidebar */
+.sidebar {
+    height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 260px;
+    background-color: #212529;
+    padding-top: 0;
+    color: #fff;
+    z-index: 1000;
+    transition: all 0.3s;
+}
+
+.sidebar-header {
+    padding: 1.5rem;
+    background-color: #1a1d20;
+    text-align: center;
+    border-bottom: 1px solid #343a40;
+}
+
+.sidebar .nav-link {
+    color: rgba(255,255,255,.75);
+    padding: 1rem 1.5rem;
+    border-left: 4px solid transparent;
+    transition: all 0.2s;
+}
+
+.sidebar .nav-link:hover {
+    color: #fff;
+    background-color: rgba(255,255,255,.1);
+}
+
+.sidebar .nav-link.active {
+    color: #fff;
+    background-color: #0d6efd;
+    border-left-color: #fff;
+}
+
+/* Main Content */
+.main-content {
+    margin-left: 260px;
+    padding: 2rem;
+    min-height: 100vh;
+}
+
+.navbar-top {
+    background-color: #fff;
+    box-shadow: 0 2px 4px rgba(0,0,0,.04);
+    margin-left: 260px;
+    padding: 0.8rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 900;
+}
+
+/* Cards */
+.card {
+    border: none;
+    box-shadow: 0 0.125rem 0.25rem rgba(0,0,0,.075);
+    border-radius: 0.5rem;
+    margin-bottom: 1rem;
+    transition: transform 0.2s;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+}
+
+.card-header {
+    background-color: #fff;
+    border-bottom: 1px solid rgba(0,0,0,.05);
+    font-weight: 600;
+    padding: 1rem 1.25rem;
+}
+
+/* Utilities */
+.d-none {
+    display: none !important;
+}
+
+/* Resource Card Specifics */
+.resource-card-status {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}
+
+.resource-progress {
+    height: 8px;
+    border-radius: 4px;
+}
+

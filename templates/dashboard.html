@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-tachometer-alt me-2 text-primary"></i>调度总览</h2>
+    <span class="text-muted">系统运行正常 | 更新时间: {{ now }}</span>
+</div>
+
+<div class="row">
+    <!-- Key Metrics -->
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-0">总订单数</h6>
+                        <h2 class="my-2">{{ summary.total_orders }}</h2>
+                        <small class="text-white-50">今日新增</small>
+                    </div>
+                    <i class="fas fa-shopping-cart fa-2x text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-0">执行任务</h6>
+                        <h2 class="my-2">{{ summary.total_tasks }}</h2>
+                        <small class="text-white-50">正在进行</small>
+                    </div>
+                    <i class="fas fa-tasks fa-2x text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-0">活跃资源</h6>
+                        <h2 class="my-2">{{ summary.resources_active }}</h2>
+                        <small class="text-white-50">在线设备</small>
+                    </div>
+                    <i class="fas fa-robot fa-2x text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="card-title mb-0">偏差告警</h6>
+                        <h2 class="my-2">{{ summary.alerts }}</h2>
+                        <small class="text-white-50">需关注</small>
+                    </div>
+                    <i class="fas fa-exclamation-triangle fa-2x text-white-50"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-4">
+    <!-- Main Chart Area -->
+    <div class="col-md-8">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="fas fa-chart-area me-2"></i>设备运行负荷趋势</span>
+                <button class="btn btn-sm btn-outline-secondary">详细分析</button>
+            </div>
+            <div class="card-body text-center">
+                <!-- Using one of the generated charts as a preview -->
+                <img src="{{ url_for('serve_charts', filename='1_设备运行负荷趋势图.png') }}" class="img-fluid" style="max-height: 350px;" alt="设备负荷趋势">
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Activity / Status -->
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="fas fa-history me-2"></i>系统状态日志
+            </div>
+            <div class="card-body p-0">
+                <div class="list-group list-group-flush">
+                    <div class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">状态校正完成</div>
+                            系统模型参数已自动校准
+                        </div>
+                        <span class="badge bg-success rounded-pill">刚刚</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">资源分配优化</div>
+                            完成新一轮任务资源匹配
+                        </div>
+                        <span class="badge bg-primary rounded-pill">1分钟前</span>
+                    </div>
+                    <div class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">新订单接入</div>
+                            接收批量出库订单请求
+                        </div>
+                        <span class="badge bg-info rounded-pill">5分钟前</span>
+                    </div>
+                     <div class="list-group-item d-flex justify-content-between align-items-start">
+                        <div class="ms-2 me-auto">
+                            <div class="fw-bold">设备自检</div>
+                            所有AGV小车状态正常
+                        </div>
+                        <span class="badge bg-secondary rounded-pill">10分钟前</span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer text-center">
+                 <a href="#" class="text-decoration-none small">查看更多日志</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

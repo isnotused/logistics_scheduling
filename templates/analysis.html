@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="fas fa-chart-line me-2 text-primary"></i>数据分析</h2>
+    <button class="btn btn-outline-primary" onclick="window.location.reload()"><i class="fas fa-sync-alt me-2"></i>刷新数据</button>
+</div>
+
+<div class="row">
+    {% for chart in charts %}
+    <div class="col-md-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-white fw-bold">
+                {{ chart.split('.')[0].split('_')[1] if '_' in chart else chart }}
+            </div>
+            <div class="card-body text-center d-flex align-items-center justify-content-center bg-light">
+                <img src="{{ url_for('serve_charts', filename=chart) }}" class="img-fluid rounded shadow-sm" alt="{{ chart }}">
+            </div>
+            <div class="card-footer bg-white">
+                <small class="text-muted"><i class="fas fa-file-image me-1"></i> {{ chart }}</small>
+                <a href="{{ url_for('serve_charts', filename=chart) }}" target="_blank" class="float-end text-decoration-none small">
+                    <i class="fas fa-expand me-1"></i>查看大图
+                </a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+
+    {% if not charts %}
+    <div class="col-12">
+        <div class="alert alert-warning text-center">
+            <i class="fas fa-exclamation-circle me-2"></i> 暂无分析图表生成，请等待系统仿真完成。
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
