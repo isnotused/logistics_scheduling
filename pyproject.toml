@@ -1,0 +1,9 @@
+[project]
+name = "logistics-scheduling"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.14"
+dependencies = [
+    "pipreqs>=0.5.0",
+]
