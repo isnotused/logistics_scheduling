@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WCS 智能仓储控制系统 | 生产监控终端</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="css/style.css" rel="stylesheet">
+</head>
+<body>
+
+    <!-- 登录网关 -->
+    <div id="login-section" class="login-body">
+        <div class="login-card fade-in border-0 shadow-lg">
+            <div class="text-center mb-4">
+                <div class="mb-3">
+                    <i class="fas fa-network-wired fa-3x text-primary"></i>
+                </div>
+                <h3 class="fw-bold text-dark">WCS 智能控制系统</h3>
+                <p class="text-muted small">生产环境安全接入网关</p>
+            </div>
+            <form id="login-form">
+                <div class="mb-3">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="fas fa-user"></i></span>
+                        <input type="text" class="form-control" value="admin">
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <div class="input-group">
+                        <span class="input-group-text bg-light"><i class="fas fa-lock"></i></span>
+                        <input type="password" class="form-control" value="123456">
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100 py-2 fw-bold shadow-sm">
+                    <i class="fas fa-sign-in-alt me-2"></i>登录
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 生产监控主界面 -->
+    <div id="main-interface" class="d-none">
+        <!-- 侧边栏 -->
+        <div class="sidebar shadow-end">
+            <div class="sidebar-header">
+                <h5 class="mb-0 fw-bold"><i class="fas fa-cubes me-2 text-primary"></i>智能调度中心</h5>
+                <small class="text-muted" style="font-size: 0.75rem;">V2.5.0 Production</small>
+            </div>
+            <div class="pt-3">
+                <a href="#" class="nav-link active" data-target="dashboard">
+                    <i class="fas fa-desktop me-3"></i>实时监控台
+                </a>
+                <a href="#" class="nav-link" data-target="tasks">
+                    <i class="fas fa-list-alt me-3"></i>任务管理
+                </a>
+                <a href="#" class="nav-link" data-target="resources">
+                    <i class="fas fa-server me-3"></i>设备状态池
+                </a>
+                <a href="#" class="nav-link" data-target="analysis">
+                    <i class="fas fa-chart-pie me-3"></i>数据分析
+                </a>
+                <a href="#" class="nav-link" data-target="settings">
+                    <i class="fas fa-cogs me-3"></i>系统参数
+                </a>
+            </div>
+            <div class="position-absolute bottom-0 w-100 p-3 border-top border-secondary">
+                <button class="btn btn-outline-light w-100 btn-sm" onclick="location.reload()">
+                    <i class="fas fa-power-off me-2"></i>安全退出
+                </button>
+            </div>
+        </div>
+
+        <!-- 顶部状态栏 -->
+        <div class="navbar-top border-bottom">
+            <div class="d-flex align-items-center">
+                <span id="system-status-badge" class="badge bg-secondary me-3">离线模式</span>
+                <span class="text-secondary small border-start ps-3">
+                    <i class="far fa-clock me-1"></i> <span id="current-time">--:--:--</span>
+                </span>
+            </div>
+            <div class="d-flex align-items-center">
+                <!-- 通知中心 -->
+                <div class="dropdown me-4">
+                    <a href="#" class="text-secondary position-relative" id="notificationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-bell fa-lg"></i>
+                        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" id="notification-badge" style="display: none;">
+                            0
+                        </span>
+                    </a>
+                    <div class="dropdown-menu dropdown-menu-end shadow-lg border-0" aria-labelledby="notificationDropdown" style="width: 320px;">
+                        <div class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom">
+                            <h6 class="mb-0 fw-bold">系统通知</h6>
+                            <small class="text-muted cursor-pointer" onclick="sys.clearNotifications()">全部已读</small>
+                        </div>
+                        <div id="notification-list" style="max-height: 300px; overflow-y: auto;">
+                            <div class="text-center py-4 text-muted small">暂无新通知</div>
+                        </div>
+                        <div class="text-center py-2 border-top bg-light rounded-bottom">
+                            <a href="#" class="text-decoration-none small fw-bold">查看所有历史通知</a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="me-4 text-end d-none d-md-block">
+                    <div class="fw-bold small">值班操作员</div>
+                    <div class="text-muted" style="font-size: 0.75rem;">OP-2024-X9</div>
+                </div>
+                <div class="dropdown">
+                    <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" class="rounded-circle shadow-sm" width="32" height="32">
+                </div>
+            </div>
+        </div>
+
+        <!-- 内容区域 -->
+        <div class="main-content bg-light">
+            
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="content-section">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h4 class="fw-bold text-dark mb-0">系统运行概览</h4>
+                        <p class="text-muted small mb-0">WCS / RCS 数据链路实时监控</p>
+                    </div>
+                    <div>
+                        <button id="btn-system-toggle" class="btn btn-success shadow-sm" onclick="sys.toggleSystemConnection()">
+                            <i class="fas fa-plug me-1"></i> 连接生产系统
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 关键指标卡片 -->
+                <div class="row g-3 mb-4">
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <h6 class="text-muted small text-uppercase fw-bold">待处理工单</h6>
+                                <div class="d-flex justify-content-between align-items-end">
+                                    <h2 class="mb-0 fw-bold text-primary" id="dash-pending-orders">0</h2>
+                                    <span class="badge bg-primary-subtle text-primary rounded-pill" style="cursor: pointer;" onclick="sys.openNewTaskModal()">+ 新增</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <h6 class="text-muted small text-uppercase fw-bold">执行中任务</h6>
+                                <div class="d-flex justify-content-between align-items-end">
+                                    <h2 class="mb-0 fw-bold text-success" id="dash-active-tasks">0</h2>
+                                    <i class="fas fa-spinner fa-spin text-success opacity-25 fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <h6 class="text-muted small text-uppercase fw-bold">在线设备</h6>
+                                <div class="d-flex justify-content-between align-items-end">
+                                    <h2 class="mb-0 fw-bold text-info" id="dash-online-devices">0</h2>
+                                    <span class="text-muted small">AGV / Stacker</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-body">
+                                <h6 class="text-muted small text-uppercase fw-bold">调度效率</h6>
+                                <div class="d-flex justify-content-between align-items-end">
+                                    <h2 class="mb-0 fw-bold text-warning" id="dash-efficiency">98%</h2>
+                                    <i class="fas fa-tachometer-alt text-warning opacity-25 fa-2x"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-3">
+                    <!-- 今日任务统计 -->
+                    <div class="col-lg-8">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header bg-white border-0 py-3">
+                                <h6 class="fw-bold mb-0"><i class="fas fa-chart-bar me-2 text-primary"></i>今日任务统计</h6>
+                            </div>
+                            <div class="card-body pt-0 d-flex flex-column justify-content-center">
+                                <div class="row mb-4 text-center">
+                                    <div class="col-6 border-end">
+                                        <h3 class="fw-bold text-primary mb-1" id="stats-today-total">0</h3>
+                                        <div class="text-muted small">今日总任务</div>
+                                    </div>
+                                    <div class="col-6">
+                                        <h3 class="fw-bold text-success mb-1" id="stats-today-completed">0</h3>
+                                        <div class="text-muted small">今日已完成</div>
+                                    </div>
+                                </div>
+                                <div class="px-4">
+                                    <div class="d-flex justify-content-between mb-2">
+                                        <span class="small fw-bold text-muted">完成进度</span>
+                                        <span class="small fw-bold text-success" id="stats-today-rate">0%</span>
+                                    </div>
+                                    <div class="progress" style="height: 10px;">
+                                        <div id="stats-progress-bar" class="progress-bar bg-success" role="progressbar" style="width: 0%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 实时日志流 -->
+                    <div class="col-lg-4">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header bg-white border-0 py-3 d-flex justify-content-between">
+                                <h6 class="fw-bold mb-0"><i class="fas fa-terminal me-2 text-dark"></i>控制指令流</h6>
+                                <span class="badge bg-light text-dark border">Live</span>
+                            </div>
+                            <div class="card-body p-0 bg-dark rounded-bottom">
+                                <div id="system-logs" class="p-3 text-monospace" style="height: 300px; overflow-y: auto; font-family: 'Consolas', monospace; font-size: 0.85rem; background: #1e1e1e;">
+                                    <!-- 日志由 JS 注入 -->
+                                    <div class="text-secondary small mb-1">Waiting for system connection...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- 任务表格预览 -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                         <div class="card border-0 shadow-sm">
+                            <div class="card-header bg-white border-0 py-3">
+                                <h6 class="fw-bold mb-0">最近活动任务</h6>
+                            </div>
+                            <div class="card-body p-0">
+                                <div class="table-responsive">
+                                    <table class="table table-hover mb-0 align-middle">
+                                        <thead class="bg-light text-muted small text-uppercase">
+                                            <tr>
+                                                <th class="ps-4">任务ID</th>
+                                                <th>操作描述</th>
+                                                <th>分配资源</th>
+                                                <th>状态</th>
+                                                <th>执行进度</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="tasks-table-body">
+                                            <tr><td colspan="5" class="text-center py-4 text-muted">暂无数据</td></tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resource Section (Grid View) -->
+            <div id="resources" class="content-section d-none">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-bold text-dark">设备状态监控</h4>
+                </div>
+                <div class="row" id="resources-container">
+                    <!-- JS 将在此处生成卡片 -->
+                </div>
+            </div>
+
+            <!-- Tasks Section -->
+            <div id="tasks" class="content-section d-none">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-bold text-dark">调度任务列表</h4>
+                    <button class="btn btn-primary" onclick="sys.openNewTaskModal()">
+                        <i class="fas fa-plus me-2"></i>新增任务
+                    </button>
+                </div>
+                
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0 align-middle">
+                                <thead class="bg-light text-muted small text-uppercase">
+                                    <tr>
+                                        <th class="ps-4">任务编号</th>
+                                        <th>任务类型</th>
+                                        <th>优先级</th>
+                                        <th>状态</th>
+                                        <th>执行区域</th>
+                                        <th>操作设备</th>
+                                        <th>负责人</th>
+                                        <th>创建时间</th>
+                                        <th class="text-end pe-4">操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="full-tasks-table-body">
+                                    <!-- JS Generated -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white border-0 py-3">
+                        <nav aria-label="Page navigation">
+                            <ul class="pagination justify-content-end mb-0" id="task-pagination">
+                                <!-- JS Generated -->
+                            </ul>
+                        </nav>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Data Analysis Section -->
+            <div id="analysis" class="content-section d-none">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="fw-bold text-dark">运营数据分析</h4>
+                    <div class="btn-group" id="analysis-time-controls">
+                        <button class="btn btn-outline-secondary btn-sm active" onclick="sys.updateAnalysisTimeRange('week', this)">本周</button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="sys.updateAnalysisTimeRange('month', this)">本月</button>
+                        <button class="btn btn-outline-secondary btn-sm" onclick="sys.updateAnalysisTimeRange('year', this)">全年</button>
+                    </div>
+                </div>
+                
+                <div class="row g-4 mb-4">
+                    <!-- 任务完成趋势 -->
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header bg-white border-0 py-3">
+                                <h6 class="fw-bold mb-0"><i class="fas fa-chart-line me-2 text-primary"></i>任务完成趋势</h6>
+                            </div>
+                            <div class="card-body">
+                                <div style="height: 300px;">
+                                    <canvas id="chart-task-trend"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 任务类型分布 -->
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header bg-white border-0 py-3">
+                                <h6 class="fw-bold mb-0"><i class="fas fa-chart-pie me-2 text-info"></i>任务类型分布</h6>
+                            </div>
+                            <div class="card-body">
+                                <div style="height: 300px;">
+                                    <canvas id="chart-task-dist"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row g-4">
+                    <!-- 各区域任务量 -->
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header bg-white border-0 py-3">
+                                <h6 class="fw-bold mb-0"><i class="fas fa-chart-bar me-2 text-success"></i>各区域任务量</h6>
+                            </div>
+                            <div class="card-body">
+                                <div style="height: 300px;">
+                                    <canvas id="chart-area-volume"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 设备效率分析 -->
+                    <div class="col-md-6">
+                        <div class="card border-0 shadow-sm h-100">
+                            <div class="card-header bg-white border-0 py-3">
+                                <h6 class="fw-bold mb-0"><i class="fas fa-tachometer-alt me-2 text-warning"></i>设备效率分析</h6>
+                            </div>
+                            <div class="card-body">
+                                <div style="height: 300px;">
+                                    <canvas id="chart-device-efficiency"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Settings Section -->
+            <div id="settings" class="content-section d-none">
+                <div class="row">
+                    <div class="col-md-8">
+                        <div class="card border-0 shadow-sm p-4 mb-4">
+                            <h5 class="fw-bold mb-4">系统核心参数</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">WCS 通信端口</label>
+                                    <input type="text" class="form-control" value="8080" disabled>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">PLC 轮询间隔 (ms)</label>
+                                    <input type="number" class="form-control" value="1500">
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">调度算法策略</label>
+                                    <select class="form-select">
+                                        <option selected>自适应混合调度 (Adaptive Hybrid)</option>
+                                        <option>距离优先 (Distance Priority)</option>
+                                        <option>负载均衡 (Load Balancing)</option>
+                                        <option>FIFO 先入先出</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">路径规划引擎</label>
+                                    <select class="form-select">
+                                        <option selected>A* 启发式搜索</option>
+                                        <option>Dijkstra 最短路径</option>
+                                    </select>
+                                </div>
+                                <div class="col-12">
+                                    <div class="form-check form-switch">
+                                        <input class="form-check-input" type="checkbox" id="auto-dispatch" checked>
+                                        <label class="form-check-label" for="auto-dispatch">启用自动任务分发</label>
+                                    </div>
+                                    <div class="form-check form-switch mt-2">
+                                        <input class="form-check-input" type="checkbox" id="collision-detect" checked>
+                                        <label class="form-check-label" for="collision-detect">启用实时碰撞检测</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card border-0 shadow-sm p-4">
+                            <h5 class="fw-bold mb-4">告警阈值设置</h5>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label">库存高位预警 (%)</label>
+                                    <input type="range" class="form-range" min="0" max="100" value="85" oninput="this.nextElementSibling.value = this.value + '%'">
+                                    <output>85%</output>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="form-label">设备负载上限 (%)</label>
+                                    <input type="range" class="form-range" min="0" max="100" value="90" oninput="this.nextElementSibling.value = this.value + '%'">
+                                    <output>90%</output>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-4">
+                        <div class="card border-0 shadow-sm p-4 bg-light">
+                            <h6 class="fw-bold">系统信息</h6>
+                            <ul class="list-unstyled small mt-3">
+                                <li class="mb-2"><span class="text-muted">版本号:</span> v2.5.0</li>
+                                <li class="mb-2"><span class="text-muted">构建时间:</span> 2025-12-09</li>
+                                <li class="mb-2"><span class="text-muted">运行环境:</span> Production</li>
+                                <li class="mb-2"><span class="text-muted">许可证:</span> Enterprise</li>
+                            </ul>
+                            <hr>
+                            <button class="btn btn-primary w-100">保存配置</button>
+                            <button class="btn btn-outline-danger w-100 mt-2">重置默认</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <!-- New Order Modal -->
+    <div class="modal fade" id="newOrderModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">新增入库工单</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="new-order-form">
+                        <div class="mb-3">
+                            <label class="form-label">物料名称</label>
+                            <select class="form-select" id="order-material">
+                                <option>电子元件 A-Type</option>
+                                <option>汽车配件 B-Series</option>
+                                <option>精密仪器 C-Class</option>
+                                <option>化工原料 D-Group</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">目标区域</label>
+                            <select class="form-select" id="order-target">
+                                <option value="A区">A区 (电子仓)</option>
+                                <option value="B区">B区 (汽配仓)</option>
+                                <option value="C区">C区 (精密仓)</option>
+                                <option value="D区">D区 (化工仓)</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">优先级</label>
+                            <select class="form-select" id="order-priority">
+                                <option value="普通">普通</option>
+                                <option value="紧急">紧急</option>
+                                <option value="特急">特急</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="sys.submitNewOrder()">提交工单</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Task Modal -->
+    <div class="modal fade" id="newTaskModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="newTaskModalLabel">新增调度任务</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="new-task-form">
+                        <input type="hidden" id="task-id-hidden">
+                        <div class="mb-3">
+                            <label class="form-label">任务类型</label>
+                            <select class="form-select" id="task-type">
+                                <option>入库调度</option>
+                                <option>出库调度</option>
+                                <option>移库调动</option>
+                                <option>盘点调动</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">执行区域</label>
+                            <select class="form-select" id="task-area">
+                                <option>A区</option>
+                                <option>B区</option>
+                                <option>C区</option>
+                                <option>D区</option>
+                                <option>E区</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">指定设备 (可选)</label>
+                            <select class="form-select" id="task-device">
+                                <option value="">自动分配</option>
+                                <option>AGV-01</option>
+                                <option>AGV-02</option>
+                                <option>堆垛机-01</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">优先级</label>
+                            <select class="form-select" id="task-priority">
+                                <option value="低">低</option>
+                                <option value="中" selected>中</option>
+                                <option value="高">高</option>
+                            </select>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-primary" onclick="sys.submitNewTask()">保存任务</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal fade" id="deleteConfirmModal" tabindex="-1">
+        <div class="modal-dialog modal-sm">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">确认删除</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <p>确定要删除该任务吗？此操作无法撤销。</p>
+                    <input type="hidden" id="delete-task-id">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">取消</button>
+                    <button type="button" class="btn btn-danger btn-sm" onclick="sys.confirmDelete()">确认删除</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/core.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>

@@ -43,14 +43,13 @@ python app.py
 - **默认密码**: `123456` (演示模式任意输入即可)
 
 ## 系统结构
-
 - `app.py`: Web 应用主入口，启动时会自动运行仿真。
 - `templates/`: 页面模板 (Bootstrap 5)。
 - `charts/`: 生成的统计图表。
 - `logs/`: 系统运行日志。
 
 
-# 纯bootstrap5
+# 纯 bootstrap5
 新建一个netlify_deploy项目
 
 ## 使用：
