@@ -6,7 +6,7 @@ pipreqs . --force --ignore .venv,__pycache__
 uv pip install -r requirements.txt
 # 物流仓储智能调度系统
 
-#    基于 Flask + Bootstrap 5 的物流仓储智能调度系统可视化界面。
+# 基于 Flask + Bootstrap 5 的物流仓储智能调度系统可视化界面。
 
 ## 功能特性
 
